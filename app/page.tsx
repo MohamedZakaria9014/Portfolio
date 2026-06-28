@@ -75,6 +75,9 @@ const skillGroups = [
     ],
   },
 ];
+
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 const projects = [
   {
     id: "aura-gallery",
@@ -87,9 +90,9 @@ const projects = [
     tech: ["React Native", "TypeScript", "Expo", "Supabase", "PostgreSQL"],
     github: "https://github.com/MohamedZakaria9014/GalleryApplication",
     images: [
-      "/portfolio/Aura Gallery MU.png",
-      "/portfolio/Aura Gallery MU 2.png",
-      "/portfolio/Aura Gallery MU 3.png",
+      `${basePath}/Aura Gallery/Aura Gallery MU.png`,
+      `${basePath}/Aura Gallery/Aura Gallery MU 2.png`,
+      `${basePath}/Aura Gallery/Aura Gallery MU 3.png`,
     ],
   },
   {
@@ -103,7 +106,10 @@ const projects = [
     tech: ["Arduino", "NodeMCU", "Firebase", "Android", "IoT"],
     github:
       "https://github.com/MohamedZakaria9014/Home-Sphere-Mobile-Application",
-    images: ["/portfolio/HomeSphere_Preview.gif", "/portfolio/HomeSphere_Preview2.gif"],
+    images: [
+      `${basePath}/HomeSphere/HomeSphere_Preview.gif`,
+      `${basePath}/HomeSphere/HomeSphere_Preview2.gif`,
+    ],
   },
   {
     id: "ocr",
@@ -115,7 +121,7 @@ const projects = [
       "Custom-trained optical character recognition model that detects and classifies handwritten characters using OpenCV-based image preprocessing and a TensorFlow CNN architecture.",
     tech: ["Python", "TensorFlow", "OpenCV", "Machine Learning"],
     github: "https://github.com/MohamedZakaria9014/OCR-Project",
-    images: ["/portfolio/OCR_Preview.png"],
+    images: [`${basePath}/OCR/OCR_Preview.png`],
   },
 ];
 
@@ -479,10 +485,11 @@ export default function PortfolioPage() {
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <span
-            className="text-xs tracking-widest uppercase font-semibold truncate max-w-[140px] sm:max-w-none"
+            className="text-xs tracking-widest uppercase font-semibold truncate"
             style={{ opacity: scrolled ? 1 : 0, transition: "opacity 0.3s" }}
           >
-            Mohamed Zakaria
+            <span className="sm:hidden">Mohamed Zakaria</span>
+            <span className="hidden sm:inline">Mohamed Zakaria Saleh Hodaib</span>
           </span>
           <div className="flex items-center gap-2">
             <a

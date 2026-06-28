@@ -1,9 +1,11 @@
 /** @type {import('next').NextConfig} */
+const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
+
 const nextConfig = {
   output: "export",
 
-  basePath: "/Portfolio",
-  assetPrefix: "/Portfolio/",
+  basePath: isGithubActions ? "/Portfolio" : "",
+  assetPrefix: isGithubActions ? "/Portfolio/" : "",
 
   trailingSlash: true,
 
@@ -13,6 +15,10 @@ const nextConfig = {
 
   images: {
     unoptimized: true,
+  },
+
+  env: {
+    NEXT_PUBLIC_BASE_PATH: isGithubActions ? "/Portfolio" : "",
   },
 };
 
