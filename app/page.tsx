@@ -87,9 +87,9 @@ const projects = [
     tech: ["React Native", "TypeScript", "Expo", "Supabase", "PostgreSQL"],
     github: "https://github.com/MohamedZakaria9014/GalleryApplication",
     images: [
-      "/Aura Gallery MU.png",
-      "/Aura Gallery MU 2.png",
-      "/Aura Gallery MU 3.png",
+      "/portfolio/Aura Gallery MU.png",
+      "/portfolio/Aura Gallery MU 2.png",
+      "/portfolio/Aura Gallery MU 3.png",
     ],
   },
   {
@@ -103,7 +103,7 @@ const projects = [
     tech: ["Arduino", "NodeMCU", "Firebase", "Android", "IoT"],
     github:
       "https://github.com/MohamedZakaria9014/Home-Sphere-Mobile-Application",
-    images: ["/HomeSphere_Preview.gif", "/HomeSphere_Preview2.gif"],
+    images: ["/portfolio/HomeSphere_Preview.gif", "/portfolio/HomeSphere_Preview2.gif"],
   },
   {
     id: "ocr",
@@ -115,7 +115,7 @@ const projects = [
       "Custom-trained optical character recognition model that detects and classifies handwritten characters using OpenCV-based image preprocessing and a TensorFlow CNN architecture.",
     tech: ["Python", "TensorFlow", "OpenCV", "Machine Learning"],
     github: "https://github.com/MohamedZakaria9014/OCR-Project",
-    images: ["/OCR_Preview.png"],
+    images: ["/portfolio/OCR_Preview.png"],
   },
 ];
 
