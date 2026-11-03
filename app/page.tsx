@@ -1,14 +1,17 @@
 "use client";
 
+import { ArrowUpRight, ArrowDown } from "lucide-react";
 import { Dithering } from "@paper-design/shaders-react";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { projects, experience, additionalWork } from "@/lib/portfolio";
 
 // ─────────────────────────────────────────────────────────────────
 // DATA
 // ─────────────────────────────────────────────────────────────────
 
 const skillGroups = [
+  { category: "Web", items: ["Next.js", "React 19", "TypeScript", "JavaScript", "Tailwind CSS", "Leaflet", "Vercel"] },
   {
     category: "Mobile",
     items: [
@@ -29,15 +32,19 @@ const skillGroups = [
       "Firebase",
       "Node.js",
       "REST APIs",
+      "Drizzle ORM",
+      "Airtable API",
+      "Row-Level Security",
       "PostgreSQL",
       "Firestore",
       "SQLite",
       "Real-time Features",
+      "Offline-first Sync",
     ],
   },
   {
     category: "State Management",
-    items: ["Redux Toolkit", "Redux Persist", "Context API", "AsyncStorage"],
+    items: ["Redux Toolkit", "Zustand", "TanStack Query", "Redux Persist", "Context API", "AsyncStorage"],
   },
   {
     category: "Authentication",
@@ -77,53 +84,6 @@ const skillGroups = [
 ];
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
-
-const projects = [
-  {
-    id: "aura-gallery",
-    name: "Aura Gallery",
-    tagline: "Art Gallery & Marketplace",
-    year: "2026",
-    stack: "React Native · TypeScript · Expo · Supabase",
-    description:
-      "Production-level mobile art gallery and marketplace. Browse artworks, attend upcoming events, and purchase pieces directly from your phone. Built with a clean architecture approach and Supabase for real-time data.",
-    tech: ["React Native", "TypeScript", "Expo", "Supabase", "PostgreSQL"],
-    github: "https://github.com/MohamedZakaria9014/GalleryApplication",
-    images: [
-      `${basePath}/Aura Gallery/Aura Gallery MU.png`,
-      `${basePath}/Aura Gallery/Aura Gallery MU 2.png`,
-      `${basePath}/Aura Gallery/Aura Gallery MU 3.png`,
-    ],
-  },
-  {
-    id: "home-sphere",
-    name: "Home Sphere",
-    tagline: "Smart Home Automation",
-    year: "2023",
-    stack: "Arduino · NodeMCU · Firebase · Android",
-    description:
-      "IoT smart home automation system with real-time device control and monitoring. Custom hardware with Arduino Mega and NodeMCU communicating through Firebase, paired with a companion Android app.",
-    tech: ["Arduino", "NodeMCU", "Firebase", "Android", "IoT"],
-    github:
-      "https://github.com/MohamedZakaria9014/Home-Sphere-Mobile-Application",
-    images: [
-      `${basePath}/HomeSphere/HomeSphere_Preview.gif`,
-      `${basePath}/HomeSphere/HomeSphere_Preview2.gif`,
-    ],
-  },
-  {
-    id: "ocr",
-    name: "OCR Engine",
-    tagline: "Handwriting Recognition",
-    year: "2023",
-    stack: "Python · TensorFlow · OpenCV",
-    description:
-      "Custom-trained optical character recognition model that detects and classifies handwritten characters using OpenCV-based image preprocessing and a TensorFlow CNN architecture.",
-    tech: ["Python", "TensorFlow", "OpenCV", "Machine Learning"],
-    github: "https://github.com/MohamedZakaria9014/OCR-Project",
-    images: [`${basePath}/OCR/OCR_Preview.png`],
-  },
-];
 
 // ─────────────────────────────────────────────────────────────────
 // ICONS
@@ -268,11 +228,13 @@ function RevealOnScroll({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+    if (el.getBoundingClientRect().top > window.innerHeight) setVisible(false);
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -289,7 +251,7 @@ function RevealOnScroll({
   return (
     <div
       ref={ref}
-      className={className}
+      className={`scroll-reveal ${className}`}
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0px)" : "translateY(28px)",
@@ -324,7 +286,7 @@ function ProjectCard({ project, dark }: ProjectCardProps) {
 
   const cardBg = dark ? "bg-white/[0.04]" : "bg-black/[0.03]";
   const cardBorder = dark ? "border-white/12" : "border-black/12";
-  const muted = dark ? "text-white/45" : "text-black/40";
+  const muted = dark ? "text-white/60" : "text-black/60";
   const tagBg = dark ? "bg-white/8 text-white/65" : "bg-black/6 text-black/55";
   const navBtn = dark
     ? "bg-black/50 hover:bg-black/80 text-white backdrop-blur-sm"
@@ -335,20 +297,29 @@ function ProjectCard({ project, dark }: ProjectCardProps) {
 
   return (
     <div
-      className={`rounded-xl border ${cardBorder} ${cardBg} overflow-hidden transition-all duration-300 hover:border-opacity-30`}
+      id={project.id}
+      className={`project-card rounded-xl border ${cardBorder} ${cardBg} overflow-hidden transition-all duration-300 hover:border-opacity-30`}
     >
       {/* Image carousel */}
       <div
         className="relative w-full overflow-hidden"
         style={{ aspectRatio: "16/9" }}
       >
-        <Image
-          src={project.images[imgIdx]}
+        {project.images.length > 0 ? <Image
+          src={`${basePath}${project.images[imgIdx]}`}
           alt={`${project.name} preview`}
           fill
           className="object-cover"
           unoptimized={project.images[imgIdx].endsWith(".gif")}
-        />
+          sizes="(max-width: 768px) 100vw, 50vw"
+        /> : (
+          <div className={`project-art project-art-${project.id}`} aria-label={`${project.name} project illustration`}>
+            <span className="project-art-orbit" aria-hidden="true" />
+            <span className="project-art-category">{project.category === "In progress" ? "In development" : `${project.category} experience`}</span>
+            <span className="project-art-name">{project.name}</span>
+            <span className="project-art-caption">{project.tagline}</span>
+          </div>
+        )}
         {project.images.length > 1 && (
           <>
             <button
@@ -395,29 +366,32 @@ function ProjectCard({ project, dark }: ProjectCardProps) {
             <p className={`text-xs mt-0.5 ${muted}`}>{project.tagline}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0 pt-0.5">
-            <span className={`text-xs font-mono ${muted}`}>{project.year}</span>
-            <a
+
+            {(project.github || project.live) && <a
               id={`${project.id}-github`}
-              href={project.github}
+              href={project.live || project.github}
               target="_blank"
               rel="noreferrer"
-              aria-label={`${project.name} on GitHub`}
+              aria-label={`${project.live ? "Visit" : "View source for"} ${project.name}`}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-all font-mono ${ghBtn}`}
             >
               <GitHubIcon size={12} />
-              Repo
+              {project.live ? "Visit" : "Repo"}
               <ExternalIcon />
-            </a>
+            </a>}
           </div>
         </div>
 
-        <p className={`text-xs font-mono mb-3 ${muted}`}>{project.stack}</p>
+        <p className={`text-xs font-mono mb-3 ${muted}`}>{project.category === "In progress" ? "In development" : project.category}</p>
         <p
           className={`text-xs leading-[1.7] mb-4 ${dark ? "text-white/65" : "text-black/60"}`}
         >
           {project.description}
         </p>
 
+        <ul className={`project-highlights text-xs leading-relaxed mb-5 ${dark ? "text-white/65" : "text-black/60"}`}>
+          {project.highlights.map((item) => <li key={item}>{item}</li>)}
+        </ul>
         <div className="flex flex-wrap gap-1.5">
           {project.tech.map((t) => (
             <span
@@ -441,6 +415,16 @@ function ProjectCard({ project, dark }: ProjectCardProps) {
 export default function PortfolioPage() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [scrolled, setScrolled] = useState(false);
+  const [filter, setFilter] = useState("All");
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -449,14 +433,10 @@ export default function PortfolioPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToContent = () => {
-    contentRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   // Tokens
   const pageBg = isDarkMode ? "bg-[#080808]" : "bg-[#f4f4f4]";
   const textColor = isDarkMode ? "text-white" : "text-black";
-  const muted = isDarkMode ? "text-white/45" : "text-black/40";
+  const muted = isDarkMode ? "text-white/60" : "text-black/60";
   const divider = isDarkMode ? "border-white/10" : "border-black/10";
   const navBg = scrolled
     ? isDarkMode
@@ -475,23 +455,25 @@ export default function PortfolioPage() {
 
   return (
     <div
-      className={`min-h-screen font-mono ${pageBg} ${textColor} transition-colors duration-300`}
+      className={`portfolio ${isDarkMode ? "portfolio-dark" : "portfolio-light"} min-h-screen ${pageBg} ${textColor} transition-colors duration-300`}
     >
       {/* ══════════════════════════════════════
           STICKY NAV
       ══════════════════════════════════════ */}
+      <a href="#projects" className="skip-link">Skip to projects</a>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navBg}`}
       >
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <span
             className="text-xs tracking-widest uppercase font-semibold truncate"
-            style={{ opacity: scrolled ? 1 : 0, transition: "opacity 0.3s" }}
+
           >
             <span className="sm:hidden">Mohamed Zakaria</span>
-            <span className="hidden sm:inline">Mohamed Zakaria Saleh Hodaib</span>
+            <span className="hidden sm:inline">MZ<span className="brand-dot">.</span></span>
           </span>
           <div className="flex items-center gap-2">
+            <div className="section-nav hidden md:flex"><a href="#projects">Work</a><a href="#experience">Experience</a><a href="#contact">Contact</a></div>
             <a
               id="nav-github"
               href="https://github.com/MohamedZakaria9014"
@@ -527,7 +509,7 @@ export default function PortfolioPage() {
               id="theme-toggle"
               onClick={() => setIsDarkMode(!isDarkMode)}
               className={`p-2 rounded-lg transition-all ${isDarkMode ? "hover:bg-white/10" : "hover:bg-black/8"}`}
-              aria-label="Toggle theme"
+              aria-label={isDarkMode ? "Switch to light theme" : "Switch to dark theme"}
             >
               {isDarkMode ? <SunIcon /> : <MoonIcon />}
             </button>
@@ -539,12 +521,12 @@ export default function PortfolioPage() {
           HERO — Full-width shader banner
       ══════════════════════════════════════ */}
       <section
-        className="relative w-full overflow-hidden"
-        style={{ height: "100vh" }}
+        className="portfolio-hero relative w-full overflow-hidden"
+        style={{ minHeight: "740px", height: "100svh" }}
       >
         {/* Shader fills the entire hero */}
-        <div className="absolute inset-0">
-          <Dithering
+        <div className="hero-shader absolute inset-0">
+          {!reducedMotion && <Dithering
             style={{ height: "100%", width: "100%" }}
             colorBack={isDarkMode ? "hsl(0, 0%, 4%)" : "hsl(0, 0%, 96%)"}
             colorFront={
@@ -558,7 +540,7 @@ export default function PortfolioPage() {
             scale={0.85}
             rotation={0}
             speed={0.2}
-          />
+          />}
         </div>
 
         {/* Light mode tint — washes the waves back so text is readable */}
@@ -579,111 +561,45 @@ export default function PortfolioPage() {
           }}
         />
 
-        {/* Hero text — centered */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-5 sm:px-6 text-center">
-          {/* Label */}
-          <p
-            className="text-xs tracking-[0.2em] sm:tracking-[0.3em] uppercase mb-4 sm:mb-6 font-mono"
-            style={{
-              color: isDarkMode ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.65)",
-            }}
-          >
-            Mobile Software Engineer
-          </p>
-
-          {/* Name */}
-          <h1
-            className="font-bold leading-none mb-4 sm:mb-6 tracking-tight"
-            style={{
-              fontSize: "clamp(2rem, 8vw, 5.5rem)",
-              color: isDarkMode ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.9)",
-              textShadow: isDarkMode
-                ? "0 0 80px rgba(150,80,255,0.3)"
-                : "0 1px 12px rgba(255,255,255,0.8)",
-            }}
-          >
-            Mohamed Zakaria
-          </h1>
-
-          {/* Brief */}
-          <p
-            className="max-w-xs sm:max-w-lg text-xs sm:text-sm leading-[1.8] mb-8 sm:mb-10 font-mono px-2 sm:px-0"
-            style={{
-              color: isDarkMode ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.7)",
-            }}
-          >
-            Building production-quality mobile applications with clean
-            architecture, offline-first patterns, and security at the core. CS
-            Graduate · Cairo, Egypt · 2024.
-          </p>
-
-          {/* CTA buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-10 sm:mb-16 px-4">
-            <button
-              id="hero-scroll-btn"
-              onClick={scrollToContent}
-              className={`text-xs px-5 py-2.5 rounded-lg font-mono transition-all ${
-                isDarkMode
-                  ? "bg-white text-black hover:bg-white/90"
-                  : "bg-black text-white hover:bg-black/85"
-              }`}
-            >
-              View My Work
-            </button>
-            <a
-              id="hero-github"
-              href="https://github.com/MohamedZakaria9014"
-              target="_blank"
-              rel="noreferrer"
-              className={`flex items-center gap-2 text-xs px-5 py-2.5 rounded-lg font-mono transition-all ${socialBtn}`}
-            >
-              <GitHubIcon size={12} />
-              GitHub
-            </a>
-            <a
-              id="hero-linkedin"
-              href="https://www.linkedin.com/in/mohamedzakariaa"
-              target="_blank"
-              rel="noreferrer"
-              className={`flex items-center gap-2 text-xs px-5 py-2.5 rounded-lg font-mono transition-all ${socialBtn}`}
-            >
-              <LinkedInIcon size={12} />
-              LinkedIn
-            </a>
-            <a
-              id="hero-email"
-              href="mailto:mohamed.zakariaa.dev@gmail.com"
-              className={`flex items-center gap-2 text-xs px-5 py-2.5 rounded-lg font-mono transition-all ${socialBtn}`}
-            >
-              <EmailIcon size={12} />
-              Email
-            </a>
+        <div className="hero-inner max-w-6xl mx-auto px-5 sm:px-6">
+          <div className="hero-copy">
+            <p className="hero-eyebrow hero-enter"><span className="status-dot" /> SOFTWARE ENGINEER · CAIRO, EGYPT</p>
+            <p className="hero-intro hero-enter">Hello, I’m Mohamed Zakaria.</p>
+            <h1 className="hero-heading hero-enter">Built with<br />purpose.<br /><span>Made to move.</span></h1>
+            <p className="hero-description hero-enter">Full-stack TypeScript. Thoughtful mobile experiences.<br className="hidden sm:block" /> From a first interaction to the systems that make it work.</p>
+            <div className="hero-actions hero-enter">
+              <a href="#projects" className="primary-cta">Explore my work <ArrowUpRight size={16} aria-hidden="true" /></a>
+              <a href="mailto:Mohamed.Zakariaa.dev@gmail.com" className="secondary-cta">Let’s talk <ArrowUpRight size={16} aria-hidden="true" /></a>
+            </div>
           </div>
-
-          {/* Scroll cue */}
-          <button
-            onClick={scrollToContent}
-            className="hidden sm:flex flex-col items-center gap-1 opacity-40 hover:opacity-70 transition-opacity"
-            aria-label="Scroll down"
-          >
-            <span className="text-xs font-mono tracking-widest uppercase">
-              Scroll
-            </span>
-            <ChevronDown />
-          </button>
+          <div className="hero-showcase hero-enter" aria-label="Featured project: Aura Gallery">
+            <div className="showcase-orbit" aria-hidden="true" />
+            <div className="showcase-label"><span>FROM IDEA TO EXPERIENCE</span><span>01 / AURA</span></div>
+            <a href="#aura-gallery" className="showcase-image-link" aria-label="Explore Aura Gallery project">
+              <Image src={`${basePath}/Aura Gallery/Aura Gallery MU.png`} alt="Aura Gallery mobile application preview" width={1200} height={900} priority className="showcase-image" />
+            </a>
+            <div className="showcase-caption"><div><span className="showcase-kicker">FEATURED MOBILE PROJECT</span><p>Aura Gallery</p></div><a href="#aura-gallery" aria-label="View Aura Gallery details"><ArrowUpRight size={18} aria-hidden="true" /></a></div>
+            <div className="showcase-code" aria-hidden="true"><span>const experience =</span> craft + curiosity;</div>
+          </div>
+          <div className="hero-bottom">
+            <p>WEB & MOBILE <span> / </span> CLEAN ARCHITECTURE <span> / </span> REAL-WORLD IMPACT</p>
+            <a href="#projects">SCROLL TO EXPLORE <ArrowDown size={14} aria-hidden="true" /></a>
+          </div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════
           CONTENT
       ══════════════════════════════════════ */}
-      <div ref={contentRef} className="max-w-5xl mx-auto px-4 sm:px-6 pb-24">
+      <div ref={contentRef} className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
         {/* ─ ABOUT ─────────────────────────── */}
         <section id="about" className="pt-20 pb-16">
           <RevealOnScroll>
             <SectionLabel label="About" muted={muted} />
           </RevealOnScroll>
 
+          <div className="about-intro"><h3>Interfaces with intention.<br /><span>Engineering with depth.</span></h3><p>I’m a Computer Science graduate and developer working across web and mobile. I build client websites, offline-first apps, and connected experiences — and help the next generation of engineers find their footing.</p></div>
+          <div className="proof-strip"><div><strong>Top 3%</strong><span>Computer Science graduate</span></div><div><strong>100+</strong><span>Students mentored</span></div><div><strong>50+</strong><span>Student projects reviewed</span></div></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
             {/* Education */}
             <RevealOnScroll delay={100}>
@@ -700,7 +616,7 @@ export default function PortfolioPage() {
                   B.Sc. Computer Science · 2024
                 </p>
                 <p className={`text-xs mt-1 font-mono ${muted}`}>
-                  3.5 GPA · Ranked 9th in class out of 350 students
+                  3.525 GPA · Ranked 9th of 350+ students · Top 3%
                 </p>
               </div>
             </RevealOnScroll>
@@ -783,12 +699,18 @@ export default function PortfolioPage() {
         {/* ─ PROJECTS ──────────────────────── */}
         <section id="projects" className="pt-16 pb-16">
           <RevealOnScroll>
-            <SectionLabel label="Projects" muted={muted} />
+            <SectionLabel label="Selected Work" muted={muted} />
+            <p className={`text-sm leading-relaxed mt-4 max-w-xl ${muted}`}>Client websites, mobile applications, and experiments — from the interface to the systems underneath.</p>
+            <div className="project-filters" aria-label="Filter projects">
+              {["All", "Web", "Mobile", "AI", "In progress"].map((category) => (
+                <button key={category} onClick={() => setFilter(category)} aria-pressed={filter === category} className={`filter-button ${filter === category ? "is-active" : ""}`}>{category} <span>{category === "All" ? projects.length : projects.filter((p) => p.category === category).length}</span></button>
+              ))}
+            </div>
           </RevealOnScroll>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
-            {projects.map((project, i) => (
-              <RevealOnScroll key={project.id} delay={i * 120}>
+            {projects.filter((project) => filter === "All" || project.category === filter).map((project, i) => (
+              <RevealOnScroll key={project.id} delay={(i % 2) * 90}>
                 <ProjectCard project={project} dark={isDarkMode} />
               </RevealOnScroll>
             ))}
@@ -797,6 +719,36 @@ export default function PortfolioPage() {
 
         {/* Divider */}
         <div className={`border-t ${divider}`} />
+
+        <section id="experience" className="py-16">
+          <RevealOnScroll><SectionLabel label="Experience" muted={muted} /></RevealOnScroll>
+          <div className="experience-list mt-8">
+            {experience.map((item, i) => (
+              <RevealOnScroll key={item.role} delay={i * 60}>
+                <article className={`experience-item border-b ${divider} py-7`}>
+                  <p className={`text-xs mb-3 ${muted}`}>{item.period}</p>
+                  <h3 className="font-semibold text-lg">{item.role}</h3>
+                  <p className={`text-sm mt-1 mb-4 ${muted}`}>{item.organization}</p>
+                  <ul className={`project-highlights text-sm leading-relaxed ${isDarkMode ? "text-white/65" : "text-black/65"}`}>
+                    {item.details.map((detail) => <li key={detail}>{detail}</li>)}
+                  </ul>
+                </article>
+              </RevealOnScroll>
+            ))}
+          </div>
+          <p className={`text-xs mt-6 ${muted}`}>Arabic · Native &nbsp; / &nbsp; English · Fluent, C1</p>
+        </section>
+
+        <section id="archive" className="py-16">
+          <RevealOnScroll><SectionLabel label="More from the workshop" muted={muted} />
+            <p className={`text-sm mt-4 ${muted}`}>Earlier experiments, internship work, hardware, and the repositories behind them.</p>
+          </RevealOnScroll>
+          <div className="archive-grid mt-8">
+            {additionalWork.map((item, i) => <RevealOnScroll key={item.repo} delay={(i % 2) * 60}>
+              <a className="archive-link" href={`https://github.com/MohamedZakaria9014/${item.repo}`} target="_blank" rel="noreferrer"><div><h3>{item.name}</h3><p>{item.language}</p></div><ArrowUpRight size={16} aria-hidden="true" /></a>
+            </RevealOnScroll>)}
+          </div>
+        </section>
 
         {/* ─ SKILLS ────────────────────────── */}
         <section id="skills" className="pt-16 pb-4">
@@ -834,8 +786,11 @@ export default function PortfolioPage() {
       {/* ══════════════════════════════════════
           FOOTER
       ══════════════════════════════════════ */}
+      <section id="contact" className="contact-section max-w-6xl mx-auto px-5 sm:px-6">
+        <RevealOnScroll><p className="hero-eyebrow">HAVE SOMETHING IN MIND?</p><h2>Let’s build<br /><span>something that matters.</span></h2><a className="contact-email" href="mailto:Mohamed.Zakariaa.dev@gmail.com">Mohamed.Zakariaa.dev@gmail.com <ArrowUpRight size={16} aria-hidden="true" /></a></RevealOnScroll>
+      </section>
       <footer className={`border-t ${divider} py-8`}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center gap-4 sm:justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center gap-4 sm:justify-between">
           <p className={`text-xs font-mono ${muted}`}>
             Mohamed Zakaria · Cairo, Egypt · 2026
           </p>

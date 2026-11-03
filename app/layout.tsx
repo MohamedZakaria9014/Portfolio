@@ -1,13 +1,10 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Mohamed Zakaria — Mobile Engineer',
-  description: 'Portfolio of Mohamed Zakaria Saleh Hodaib, Mobile Software Engineer specializing in React Native, TypeScript, and production-grade mobile applications.',
+  title: 'Mohamed Zakaria — Full-Stack & Mobile Engineer',
+  description: 'Portfolio of Mohamed Zakaria Saleh Hodaib, Software Engineer building full-stack TypeScript websites and React Native applications. Explore client work, offline-first apps, and engineering projects.',
   generator: 'next',
 }
 
