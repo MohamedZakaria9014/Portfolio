@@ -105,6 +105,25 @@ function LinkedInIcon({ size = 16 }: { size?: number }) {
   );
 }
 
+function GlobeIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+      <path d="M2 12h20" />
+    </svg>
+  );
+}
+
 function ExternalIcon() {
   return (
     <svg
@@ -305,6 +324,12 @@ function ProjectCard({ project, dark }: ProjectCardProps) {
         className="relative w-full overflow-hidden"
         style={{ aspectRatio: "16/9" }}
       >
+        {project.live && (
+          <div className="absolute top-3 left-3 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-medium tracking-wider uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 backdrop-blur-md shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            LIVE
+          </div>
+        )}
         {project.images.length > 0 ? <Image
           src={`${basePath}${project.images[imgIdx]}`}
           alt={`${project.name} preview`}
@@ -367,18 +392,34 @@ function ProjectCard({ project, dark }: ProjectCardProps) {
           </div>
           <div className="flex items-center gap-2 shrink-0 pt-0.5">
 
-            {(project.github || project.live) && <a
-              id={`${project.id}-github`}
-              href={project.live || project.github}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={`${project.live ? "Visit" : "View source for"} ${project.name}`}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-all font-mono ${ghBtn}`}
-            >
-              <GitHubIcon size={12} />
-              {project.live ? "Visit" : "Repo"}
-              <ExternalIcon />
-            </a>}
+            {project.live && (
+              <a
+                id={`${project.id}-website`}
+                href={project.live}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`Visit ${project.name} website`}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-all font-mono ${ghBtn}`}
+              >
+                <GlobeIcon size={12} />
+                Website
+                <ExternalIcon />
+              </a>
+            )}
+            {project.github && (
+              <a
+                id={`${project.id}-github`}
+                href={project.github}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`View source for ${project.name}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-all font-mono ${ghBtn}`}
+              >
+                <GitHubIcon size={12} />
+                Repo
+                <ExternalIcon />
+              </a>
+            )}
           </div>
         </div>
 
@@ -433,6 +474,15 @@ export default function PortfolioPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+      window.history.pushState(null, "", `#${id}`);
+    }
+  };
+
   // Tokens
   const pageBg = isDarkMode ? "bg-[#080808]" : "bg-[#f4f4f4]";
   const textColor = isDarkMode ? "text-white" : "text-black";
@@ -473,13 +523,17 @@ export default function PortfolioPage() {
             <span className="hidden sm:inline">MZ<span className="brand-dot">.</span></span>
           </span>
           <div className="flex items-center gap-2">
-            <div className="section-nav hidden md:flex"><a href="#projects">Work</a><a href="#experience">Experience</a><a href="#contact">Contact</a></div>
+            <div className="section-nav hidden md:flex">
+              <a href="#projects" onClick={(e) => handleScrollTo(e, "projects")}>Work</a>
+              <a href="#experience" onClick={(e) => handleScrollTo(e, "experience")}>Experience</a>
+              <a href="#contact" onClick={(e) => handleScrollTo(e, "contact")}>Contact</a>
+            </div>
             <a
               id="nav-github"
               href="https://github.com/MohamedZakaria9014"
               target="_blank"
               rel="noreferrer"
-              className={`flex items-center gap-1.5 text-xs px-2 sm:px-3 py-1.5 rounded-lg transition-all ${socialBtn}`}
+              className={`flex items-center gap-1.5 text-sm font-medium px-2 sm:px-3 py-1.5 rounded-lg transition-all ${socialBtn}`}
               aria-label="GitHub"
             >
               <GitHubIcon size={14} />
@@ -490,7 +544,7 @@ export default function PortfolioPage() {
               href="https://www.linkedin.com/in/mohamedzakariaa"
               target="_blank"
               rel="noreferrer"
-              className={`flex items-center gap-1.5 text-xs px-2 sm:px-3 py-1.5 rounded-lg transition-all ${socialBtn}`}
+              className={`flex items-center gap-1.5 text-sm font-medium px-2 sm:px-3 py-1.5 rounded-lg transition-all ${socialBtn}`}
               aria-label="LinkedIn"
             >
               <LinkedInIcon size={14} />
@@ -499,7 +553,7 @@ export default function PortfolioPage() {
             <a
               id="nav-email"
               href="mailto:mohamed.zakariaa.dev@gmail.com"
-              className={`flex items-center gap-1.5 text-xs px-2 sm:px-3 py-1.5 rounded-lg transition-all ${socialBtn}`}
+              className={`flex items-center gap-1.5 text-sm font-medium px-2 sm:px-3 py-1.5 rounded-lg transition-all ${socialBtn}`}
               aria-label="Email"
             >
               <EmailIcon size={14} />
@@ -522,7 +576,6 @@ export default function PortfolioPage() {
       ══════════════════════════════════════ */}
       <section
         className="portfolio-hero relative w-full overflow-hidden"
-        style={{ minHeight: "740px", height: "100svh" }}
       >
         {/* Shader fills the entire hero */}
         <div className="hero-shader absolute inset-0">
@@ -568,7 +621,7 @@ export default function PortfolioPage() {
             <h1 className="hero-heading hero-enter">Built with<br />purpose.<br /><span>Made to move.</span></h1>
             <p className="hero-description hero-enter">Full-stack TypeScript. Thoughtful mobile experiences.<br className="hidden sm:block" /> From a first interaction to the systems that make it work.</p>
             <div className="hero-actions hero-enter">
-              <a href="#projects" className="primary-cta">Explore my work <ArrowUpRight size={16} aria-hidden="true" /></a>
+              <a href="#projects" onClick={(e) => handleScrollTo(e, "projects")} className="primary-cta">Explore my work <ArrowUpRight size={16} aria-hidden="true" /></a>
               <a href="mailto:Mohamed.Zakariaa.dev@gmail.com" className="secondary-cta">Let’s talk <ArrowUpRight size={16} aria-hidden="true" /></a>
             </div>
           </div>
@@ -583,7 +636,7 @@ export default function PortfolioPage() {
           </div>
           <div className="hero-bottom">
             <p>WEB & MOBILE <span> / </span> CLEAN ARCHITECTURE <span> / </span> REAL-WORLD IMPACT</p>
-            <a href="#projects">SCROLL TO EXPLORE <ArrowDown size={14} aria-hidden="true" /></a>
+            <a href="#projects" onClick={(e) => handleScrollTo(e, "projects")}>SCROLL TO EXPLORE <ArrowDown size={14} aria-hidden="true" /></a>
           </div>
         </div>
       </section>

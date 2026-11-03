@@ -1,6 +1,8 @@
-/** @type {import('next').NextConfig} */
+import { PHASE_DEVELOPMENT_SERVER } from 'next/constants.js';
+
 const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
 
@@ -22,4 +24,8 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default function config(phase) {
+  return phase === PHASE_DEVELOPMENT_SERVER
+    ? { ...nextConfig, distDir: '.next-dev' }
+    : nextConfig;
+}
